@@ -37,9 +37,17 @@ body,html,#root{height:100%;margin:0}
   .hero-visual{height:220px}
 }
 
-/* Hero subtle float */
+/* Hero subtle float (reduced amplitude for stability) */
 .hero-title{animation:heroFloat 6s ease-in-out infinite}
-@keyframes heroFloat{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+@keyframes heroFloat{0%{transform:translateY(0)}50%{transform:translateY(-3px)}100%{transform:translateY(0)}}
+
+/* Respect reduced-motion and disable on small screens to avoid layout movement */
+@media (prefers-reduced-motion: reduce){
+  .hero-title{animation:none !important}
+}
+@media (max-width:700px){
+  .hero-title{animation:none}
+}
 
 /* CTA shimmer */
 .nav-cta{display:inline-block;position:relative;padding:10px 18px;border-radius:28px;background:linear-gradient(90deg,#c7a97e 0%, #d9b78f 50%, #c7a97e 100%);color:#0b0b0b;text-decoration:none;font-weight:600;overflow:hidden}
