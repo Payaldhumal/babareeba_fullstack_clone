@@ -104,13 +104,44 @@ export default function App() {
         </main>
 
         <footer className="site-footer">
-          <div className="footer-links">
-            <a href="/contact">CONTACT</a>
-            <a href="/reservation">RESERVATION</a>
-            <a href="https://www.instagram.com/babareeba.pune">Instagram</a>
-            <a href="https://wa.me/917219694001">WhatsApp</a>
+          <div className="footer-grid">
+            <div className="footer-brand">
+              <img src="/assets/logo-Bybhg_qO.png" alt="Ba Ba Reeba" style={{width:72}} />
+              <p className="muted">An intimate hideaway serving crafted pours and moments.</p>
+            </div>
+
+            <div className="footer-links-col">
+              <h4>Explore</h4>
+              <nav className="footer-links">
+                <a href="/menu">Menu</a>
+                <a href="/gallery">Gallery</a>
+                <a href="/contact">Contact</a>
+              </nav>
+            </div>
+
+            <div className="footer-contact-col">
+              <h4>Contact</h4>
+              <div className="muted">Pune, India · <a href="https://wa.me/917219694001">+91 72196 94001</a></div>
+              <div style={{marginTop:8}}><a href="https://www.instagram.com/babareeba.pune">@babareeba.pune</a></div>
+            </div>
+
+            <div className="footer-newsletter">
+              <h4>Stay In The Loop</h4>
+              <form className="newsletter-form" onSubmit={(e)=>{e.preventDefault(); alert('Thanks — you\'re subscribed (demo)')}}>
+                <input aria-label="Email" name="email" placeholder="you@domain.com" />
+                <button className="nav-cta" type="submit">Subscribe</button>
+              </form>
+              <div className="social-links" aria-hidden>
+                <a href="https://www.instagram.com/babareeba.pune">Instagram</a>
+                <a href="https://wa.me/917219694001">WhatsApp</a>
+              </div>
+            </div>
           </div>
-          <div className="copyright">© 2026 BA BA REEBA. ALL RIGHTS RESERVED.</div>
+
+          <div className="footer-bottom">
+            <div className="copyright">© 2026 BA BA REEBA. ALL RIGHTS RESERVED.</div>
+            <button className="back-to-top" onClick={()=>window.scrollTo({top:0,behavior:'smooth'})}>Back to top</button>
+          </div>
         </footer>
       </div>
     </BrowserRouter>
