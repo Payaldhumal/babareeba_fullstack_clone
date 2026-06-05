@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react'
+import { Box, Heading, Text, Input, SimpleGrid, Image, Stack, Badge } from '@chakra-ui/react'
 
 const menuItems = [
   {name:'Matcha Mirage', desc:'Vibrant tea infusion — delicate matcha layered with citrus', price:'₹450', img:'/assets/portfolio-2-B9bJUlp2.png'},
@@ -17,34 +18,31 @@ export default function Menu(){
   },[q])
 
   return (
-    <section className="section menu" aria-labelledby="menu-heading">
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',gap:12}}>
-        <div>
-          <h2 id="menu-heading">Menu</h2>
-          <p style={{color:'var(--muted)',marginTop:6}}>Signature drinks and seasonal specials — handcrafted and limited.</p>
-        </div>
-        <div style={{minWidth:220}}>
-          <label className="sr-only" htmlFor="menu-search">Search menu</label>
-          <input id="menu-search" placeholder="Search drinks" value={q} onChange={e=>setQ(e.target.value)} style={{width:'100%',padding:10,borderRadius:10,border:'1px solid rgba(255,255,255,0.04)',background:'transparent',color:'#fff'}} />
-        </div>
-      </div>
+    <Box as="section" py={12} maxW="7xl" mx="auto" px={{base:4, md:8}}>
+      <Box display="flex" justifyContent="space-between" alignItems="baseline" gap={6}>
+        <Box>
+          <Heading as="h2" size="lg" id="menu-heading">Menu</Heading>
+          <Text color="muted.500" mt={2}>Signature drinks and seasonal specials — handcrafted and limited.</Text>
+        </Box>
+        <Box minW={{base:'100%', md:220}} maxW={320}>
+          <Input id="menu-search" placeholder="Search drinks" value={q} onChange={e=>setQ(e.target.value)} bg="whiteAlpha.50" />
+        </Box>
+      </Box>
 
-      <div className="menu-grid" style={{marginTop:18}}>
+      <SimpleGrid columns={{base:1, md:2, lg:3}} gap={6} mt={6}>
         {items.map(item => (
-          <article key={item.name} className="menu-item card" tabIndex={0}>
-            <div className="menu-media">
-              <img src={item.img} alt={item.name} />
-            </div>
-            <div className="menu-body">
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline'}}>
-                <h3>{item.name}</h3>
-                <div className="menu-price">{item.price}</div>
-              </div>
-              <p style={{color:'var(--muted)',marginTop:8}}>{item.desc}</p>
-            </div>
-          </article>
+          <Box key={item.name} as="article" bg="whiteAlpha.50" borderRadius="md" overflow="hidden" boxShadow="md" tabIndex={0}>
+            <Image src={item.img} alt={item.name} objectFit="cover" w="100%" h={44} />
+            <Box p={4}>
+              <Box display="flex" justifyContent="space-between" alignItems="baseline">
+                <Heading as="h3" size="sm">{item.name}</Heading>
+                <Badge colorScheme="brand" variant="subtle">{item.price}</Badge>
+              </Box>
+              <Text color="muted.500" mt={3}>{item.desc}</Text>
+            </Box>
+          </Box>
         ))}
-      </div>
-    </section>
+      </SimpleGrid>
+    </Box>
   )
 }

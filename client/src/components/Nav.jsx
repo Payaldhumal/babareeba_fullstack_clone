@@ -1,39 +1,33 @@
+import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import './nav.css'
-import React, { useState } from 'react'
+import { Flex, Box, HStack, IconButton, useDisclosure, Stack, Heading, Link as ChakraLink } from '@chakra-ui/react'
+import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons'
 
 export default function Nav(){
-  const linkVariant = { hover: { y: -2 }, tap: { scale: 0.98 } }
-  const [open, setOpen] = useState(false)
+  const { isOpen, onOpen, onClose } = useDisclosure()
   return (
-    <nav className="site-nav">
-      <div className="nav-inner">
-        <div className="nav-left">
-          <NavLink to="/" className="nav-logo">BA BA REEBA</NavLink>
-        </div>
-        <div className="nav-right">
-          <div className="desktop-links">
-            <motion.div variants={linkVariant} whileHover="hover" whileTap="tap"><NavLink to="/menu" className={({isActive}) => isActive? 'nav-link active':'nav-link'}>MENU</NavLink></motion.div>
-            <motion.div variants={linkVariant} whileHover="hover" whileTap="tap"><NavLink to="/gallery" className={({isActive}) => isActive? 'nav-link active':'nav-link'}>GALLERY</NavLink></motion.div>
-            <motion.div variants={linkVariant} whileHover="hover" whileTap="tap"><NavLink to="/contact" className={({isActive}) => isActive? 'nav-link active':'nav-link'}>CONTACT</NavLink></motion.div>
-          </div>
-          <button className={`nav-burger ${open? 'open':''}`} aria-label="Open menu" aria-expanded={open} onClick={()=>setOpen(v=>!v)}>
-            <motion.span className="burger-line" animate={open?{rotate:45,y:6}:{rotate:0,y:0}} transition={{duration:0.18}} />
-            <motion.span className="burger-line" animate={open?{opacity:0}:{opacity:1}} transition={{duration:0.12}} />
-            <motion.span className="burger-line" animate={open?{rotate:-45,y:-6}:{rotate:0,y:0}} transition={{duration:0.18}} />
-          </button>
-        </div>
-      </div>
-      <AnimatePresence>
-        {open && (
-          <motion.div className="mobile-menu" initial={{height:0,opacity:0}} animate={{height:'auto',opacity:1}} exit={{height:0,opacity:0}} transition={{type:'spring'}}>
-            <NavLink to="/menu" className="mobile-link" onClick={()=>setOpen(false)}>MENU</NavLink>
-            <NavLink to="/gallery" className="mobile-link" onClick={()=>setOpen(false)}>GALLERY</NavLink>
-            <NavLink to="/contact" className="mobile-link" onClick={()=>setOpen(false)}>CONTACT</NavLink>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </nav>
+    <Box as="nav" bg="transparent" px={{base:4, md:8}} py={4}>
+      <Flex align="center" justify="space-between" maxW="7xl" mx="auto">
+        <Heading as="h1" size="md"> <ChakraLink as={NavLink} to="/">BA BA REEBA</ChakraLink> </Heading>
+
+        <HStack as="nav" spacing={6} display={{base:'none', md:'flex'}}>
+          <ChakraLink as={NavLink} to="/menu">MENU</ChakraLink>
+          <ChakraLink as={NavLink} to="/gallery">GALLERY</ChakraLink>
+          <ChakraLink as={NavLink} to="/contact">CONTACT</ChakraLink>
+        </HStack>
+
+        <IconButton aria-label={isOpen? 'Close menu' : 'Open menu'} display={{md:'none'}} icon={isOpen? <CloseIcon/> : <HamburgerIcon/>} onClick={isOpen? onClose : onOpen} />
+      </Flex>
+
+      {isOpen && (
+        <Box pb={4} display={{md:'none'}}>
+          <Stack as="nav" spacing={3}>
+            <ChakraLink as={NavLink} to="/menu" onClick={onClose}>MENU</ChakraLink>
+            <ChakraLink as={NavLink} to="/gallery" onClick={onClose}>GALLERY</ChakraLink>
+            <ChakraLink as={NavLink} to="/contact" onClick={onClose}>CONTACT</ChakraLink>
+          </Stack>
+        </Box>
+      )}
+    </Box>
   )
 }
