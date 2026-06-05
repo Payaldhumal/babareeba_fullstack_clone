@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
+import { Box, Heading, Input, Button, Stack, Text, Image, SimpleGrid, useToast } from '@chakra-ui/react'
 
-const API = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000'
+const API = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
 export default function Admin(){
   const [contacts,setContacts] = useState([])
@@ -12,6 +13,7 @@ export default function Admin(){
   const [uploads,setUploads] = useState([])
   const [selectedFile,setSelectedFile] = useState(null)
   const [uploading,setUploading] = useState(false)
+  const toast = useToast()
 
   useEffect(()=>{
     if(token) loadContacts()
@@ -32,6 +34,7 @@ export default function Admin(){
       setToken(json.token)
       setUsername('')
       setPassword('')
+      toast({status:'success',title:'Logged in'})
     }catch(err){ setError(err.message || 'Login error') }
   }
 
@@ -77,7 +80,8 @@ export default function Admin(){
       if(!res.ok) throw new Error(json.status || 'upload_failed')
       setSelectedFile(null)
       await loadUploads()
-    }catch(err){ setError(err.message||'Upload failed') }
+      toast({status:'success',title:'Upload successful'})
+    }catch(err){ setError(err.message||'Upload failed'); toast({status:'error',title:'Upload failed'}) }
     setUploading(false)
   }
 
@@ -87,69 +91,66 @@ export default function Admin(){
       const res = await fetch(`${API}/uploads/${encodeURIComponent(name)}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } })
       if(!res.ok) throw new Error('Delete failed')
       await loadUploads()
-    }catch(err){ setError(err.message||'Delete failed') }
+      toast({status:'success',title:'Deleted'})
+    }catch(err){ setError(err.message||'Delete failed'); toast({status:'error',title:'Delete failed'}) }
   }
 
   if(!token){
     return (
-      <section className="section admin">
-        <h2>Admin Login</h2>
-        <form onSubmit={login} style={{maxWidth:420}}>
-          {error && <div style={{color:'crimson',marginBottom:8}}>{error}</div>}
-          <div style={{marginBottom:8}}>
-            <label>Username</label>
-            <input value={username} onChange={e=>setUsername(e.target.value)} required />
-          </div>
-          <div style={{marginBottom:8}}>
-            <label>Password</label>
-            <input type="password" value={password} onChange={e=>setPassword(e.target.value)} required />
-          </div>
-          <div>
-            <button type="submit">Sign In</button>
-          </div>
-        </form>
-      </section>
+      <Box as="section" py={12} maxW="7xl" mx="auto" px={{base:4, md:8}}>
+        <Heading as="h2" size="lg">Admin Login</Heading>
+        <Box as="form" onSubmit={login} maxW={420} mt={4}>
+          {error && <Text color="red.400" mb={3}>{error}</Text>}
+          <Stack spacing={3}>
+            <Input placeholder="Username" value={username} onChange={e=>setUsername(e.target.value)} required />
+            <Input placeholder="Password" type="password" value={password} onChange={e=>setPassword(e.target.value)} required />
+            <Button type="submit" colorScheme="brand">Sign In</Button>
+          </Stack>
+        </Box>
+      </Box>
     )
   }
 
   return (
-    <section className="section admin">
-      <h2>Contact Submissions</h2>
-      <div style={{marginBottom:12}}>
-        <button onClick={loadContacts} disabled={loading} style={{marginRight:8}}>Refresh</button>
-        <button onClick={logout}>Logout</button>
-      </div>
-      <section style={{marginTop:12,marginBottom:18}}>
-        <h3>Uploads</h3>
-        {error && <div style={{color:'crimson',marginBottom:8}}>{error}</div>}
-        <form onSubmit={uploadFile} style={{display:'flex',gap:8,alignItems:'center',marginBottom:12}}>
-          <input type="file" accept="image/*" onChange={e=>setSelectedFile(e.target.files?.[0]||null)} />
-          <button type="submit" disabled={uploading || !selectedFile}>{uploading? 'Uploading...':'Upload'}</button>
-        </form>
-        <div style={{display:'flex',gap:12,flexWrap:'wrap'}}>
+    <Box as="section" py={12} maxW="7xl" mx="auto" px={{base:4, md:8}}>
+      <Heading as="h2" size="lg">Contact Submissions</Heading>
+      <Box mt={4} display="flex" gap={3}>
+        <Button onClick={loadContacts} isLoading={loading} colorScheme="brand">Refresh</Button>
+        <Button onClick={logout} variant="ghost">Logout</Button>
+      </Box>
+
+      <Box mt={6}>
+        <Heading as="h3" size="md" mb={3}>Uploads</Heading>
+        {error && <Text color="red.400" mb={3}>{error}</Text>}
+        <Box as="form" onSubmit={uploadFile} display="flex" gap={3} alignItems="center" mb={4}>
+          <Input type="file" accept="image/*" onChange={e=>setSelectedFile(e.target.files?.[0]||null)} />
+          <Button type="submit" isLoading={uploading} colorScheme="brand" disabled={!selectedFile}>{uploading? 'Uploading...':'Upload'}</Button>
+        </Box>
+        <SimpleGrid columns={{base:2, md:4}} gap={3}>
           {uploads.map(f=> (
-            <div key={f.filename} style={{width:120}}>
-              <img src={`${API}/uploads/${f.filename}`} alt={f.filename} style={{width:'100%',height:80,objectFit:'cover',borderRadius:6}} />
-              <div style={{display:'flex',justifyContent:'space-between',marginTop:6,fontSize:12}}>
-                <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',maxWidth:72}}>{f.filename}</span>
-                <button onClick={()=>deleteUpload(f.filename)} style={{background:'transparent',border:0,color:'crimson'}}>✕</button>
-              </div>
-            </div>
+            <Box key={f.filename}>
+              <Image src={`${API}/uploads/${f.filename}`} alt={f.filename} objectFit="cover" w="100%" h={24} borderRadius="md" />
+              <Box display="flex" justifyContent="space-between" alignItems="center" mt={2} fontSize="sm">
+                <Text isTruncated maxW={72}>{f.filename}</Text>
+                <Button size="sm" onClick={()=>deleteUpload(f.filename)} colorScheme="red" variant="ghost">Delete</Button>
+              </Box>
+            </Box>
           ))}
-        </div>
-      </section>
-      {loading && <div>Loading...</div>}
-      {error && <div style={{color:'crimson'}}>{error}</div>}
-      {!loading && contacts.length===0 && <div>No submissions yet.</div>}
-      <ul style={{listStyle:'none',padding:0}}>
+        </SimpleGrid>
+      </Box>
+
+      {loading && <Text mt={4}>Loading...</Text>}
+      {!loading && contacts.length===0 && <Text mt={4}>No submissions yet.</Text>}
+
+      <Stack mt={6} spacing={3}>
         {contacts.map(c=> (
-          <li key={c.id} style={{border:'1px solid rgba(0,0,0,0.08)',padding:12,marginBottom:8}}>
-            <div style={{fontWeight:700}}>{c.name} <span style={{fontWeight:400,marginLeft:8,fontSize:12,color:'#666'}}>{c.email}</span></div>
-            <div style={{marginTop:6,whiteSpace:'pre-wrap'}}>{c.message}</div>
-            <div style={{marginTop:6,fontSize:12,color:'#888'}}>{c.receivedAt}</div>
-          </li>
+          <Box key={c.id} borderWidth={1} borderColor="whiteAlpha.100" p={3} borderRadius="md">
+            <Box fontWeight={700}>{c.name} <Text as="span" fontWeight={400} ml={3} fontSize="sm" color="muted.500">{c.email}</Text></Box>
+            <Text mt={2} whiteSpace="pre-wrap">{c.message}</Text>
+            <Text mt={2} fontSize="sm" color="muted.500">{c.receivedAt}</Text>
+          </Box>
         ))}
-      </ul>
-    </section>
+      </Stack>
+    </Box>
   )
 }

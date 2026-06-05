@@ -1,6 +1,11 @@
+require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet')
+const morgan = require('morgan')
+const rateLimit = require('express-rate-limit')
+const crypto = require('crypto')
 const app = express();
 const fs = require('fs')
 const path = require('path')
@@ -11,8 +16,28 @@ const ADMIN_PASS = process.env.ADMIN_PASS || 'secret'
 const JWT_SECRET = process.env.JWT_SECRET || 'change_this_secret'
 
 
+// Security headers
+app.use(helmet())
+
+// CORS (consider restricting origin in production)
 app.use(cors());
+
+// Request ID for tracing
+app.use((req, res, next)=>{
+	try{ req.id = crypto.randomUUID() }catch(e){ req.id = Date.now().toString() }
+	res.setHeader('X-Request-Id', req.id)
+	next()
+})
+
+// Logging
+app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent" :req[header]'))
+
+// Body parser
 app.use(express.json());
+
+// Basic rate limiting
+const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200, standardHeaders: true, legacyHeaders: false, message: { status: 'rate_limited' } })
+app.use(limiter)
 
 app.get('/', (req,res)=>res.json({message:'API Running'}));
 
