@@ -40,10 +40,19 @@ npm run dev
 
 4. Open http://localhost:5173 in your browser.
 
+Note: Vite may auto-increment the dev port if the default is in use (e.g. 5173 → 5174 → 5175).
+
+Client environment:
+- `VITE_API_URL` — base URL for the API (e.g. `http://localhost:5000`). Set this in `client/.env` for dev and in your production build environment.
+
 ## Environment variables (server)
 - `ADMIN_USER` (default: `admin`)
 - `ADMIN_PASS` (default: `secret`)
 - `JWT_SECRET` (default: `change_this_secret`) — change for production
+
+Server example: copy `server/.env.example` to `server/.env` and update secrets.
+
+Client example: create `client/.env` with `VITE_API_URL=http://localhost:5000` before running the client dev server.
 
 ## Admin / Uploads
 - Admin login is available on the client Admin page. After login you can view contact submissions and manage uploaded images.
@@ -56,6 +65,26 @@ npm run dev
 
 ## Deployment
 Build the client and deploy to static hosting (Netlify/Vercel) and host the server on any Node-capable host. If using a single repo, build the client into a `dist` folder and serve static files from the Express server.
+
+Docker (optional): this repo includes `Dockerfile`s and a `docker-compose.yml` to run both services together. Example:
+
+```powershell
+# from repo root
+docker compose up --build
+```
+
+Production build (client):
+
+```powershell
+cd client
+npm run build
+# serve the generated `dist` folder from any static host or copy into the server `client/dist` and let Express serve it
+```
+
+Notes on recent updates
+- UI migrated to Chakra UI (components under `client/src/components` and pages under `client/src/pages`).
+- `GalleryModal`, `Contact`, and `Admin` pages use Chakra components and `import.meta.env.VITE_API_URL` for API requests.
+- Server: added basic security and logging middlewares, and `.env.example` for recommended env variables.
 
 ## ZIP for submission (Windows PowerShell)
 
