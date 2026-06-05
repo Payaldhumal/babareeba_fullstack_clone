@@ -86,6 +86,27 @@ Notes on recent updates
 - `GalleryModal`, `Contact`, and `Admin` pages use Chakra components and `import.meta.env.VITE_API_URL` for API requests.
 - Server: added basic security and logging middlewares, and `.env.example` for recommended env variables.
 
+Netlify Deploy (team: `payaldhumal121`)
+
+- This repo includes a `netlify.toml` configured to build the client and publish `client/dist` as the SPA.
+- To deploy to your Netlify team:
+	1. Go to https://app.netlify.com/teams/payaldhumal121 and choose "New site from Git".
+	2. Connect GitHub and select the `Payaldhumal/babareeba_fullstack_clone` repository.
+	3. Set build settings as below (these are pre-filled by `netlify.toml` but verify):
+
+```
+Build command: npm --prefix client ci && npm --prefix client run build
+Publish directory: client/dist
+```
+
+	4. Add environment variables in the Netlify Site settings → Build & deploy → Environment:
+		 - `VITE_API_URL` — set to your backend URL (e.g., `https://your-api.example.com`)
+	5. Trigger a deploy. Netlify will build the client and publish the `dist` folder.
+
+Notes:
+- The Express server in `server/` is not hosted on Netlify by default — Netlify hosts only the static client. You can host the server separately (Render, Heroku, DigitalOcean, Azure) and point `VITE_API_URL` to that server.
+- If you want to consolidate both in Netlify, consider converting server endpoints into Netlify Functions (not included by default).
+
 ## ZIP for submission (Windows PowerShell)
 
 ```powershell

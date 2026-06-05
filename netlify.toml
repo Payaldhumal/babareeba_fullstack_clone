@@ -1,0 +1,25 @@
+[build]
+  command = "npm --prefix client ci && npm --prefix client run build"
+  publish = "client/dist"
+  functions = "netlify/functions"
+
+[context.production.environment]
+  NODE_ENV = "production"
+
+[dev]
+  command = "npm --prefix client run dev"
+
+[build.environment]
+  # Ensure the client build can contact your API; set on Netlify UI or via team env
+  VITE_API_URL = "http://localhost:5000"
+
+[[[redirects]]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
